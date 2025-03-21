@@ -1,5 +1,9 @@
+# Configuration Folder
 .pio/*
 .vscode/*
+
+data/*
+env/*
 
 # Prerequisites
 *.d
