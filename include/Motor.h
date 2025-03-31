@@ -5,7 +5,7 @@
 
 class Motor {
 public:
-    Motor(uint8_t pwmPin, uint8_t encoderPinA, uint8_t encoderPinB);
+    Motor(uint8_t pwmPin, uint8_t encoderPinA, uint8_t encoderPinB, uint8_t directionPin1, uint8_t directionPin2);
     void setTargetSpeed(float speed);
     void update();
     float getCurrentSpeed();
@@ -17,6 +17,8 @@ private:
     uint8_t pwmPin;
     uint8_t encoderPinA;
     uint8_t encoderPinB;
+    uint8_t directionPin1;
+    uint8_t directionPin2;
 
     float targetSpeed;
     float currentSpeed;

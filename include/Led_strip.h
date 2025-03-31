@@ -7,7 +7,6 @@
 class LedStrip {
 public:
     LedStrip(uint16_t numPixels, uint8_t pin);
-    ~LedStrip();
 
     void begin();
     void show();
