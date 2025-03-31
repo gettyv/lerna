@@ -3,7 +3,45 @@
 #include <Encoder.h>
 #include <constants.h>
 
-Encoder encoder(MOTOR1_ENCODER_PIN_A, MOTOR1_ENCODER_PIN_B, ENCODER_PPR, ENCODER_VEL_UPDATE_PERIOD_US, false);
+// Encoders and state
+uint32_t lastUpdateTime = NULL;
+uint32_t currentUpdateTime = NULL;
+
+Encoder encoderMotorA;
+Encoder encoderMotorB;
+
+bool encoderALastStateA = NULL;
+bool encoderBLastStateA = NULL;
+
+long encoderAPosition = 0;
+long encoderBPosition = 0;
+
+long encoderALastPosition = 0;
+long encoderBLastPosition = 0;
+
+// ISR that should be called routinely by the timer
+void timerUpdateEncoderVelocity() {
+  currentUpdateTime = micros();
+
+  encoderMotorA.updateVelocity(encoderAPosition, 
+    encoderALastPosition, currentUpdateTime, lastUpdateTime);
+  encoderMotorB.updateVelocity(encoderBPosition, 
+    encoderBLastPosition, currentUpdateTime, lastUpdateTime);
+
+  encoderALastPosition = encoderAPosition;
+  encoderBLastPosition = encoderBPosition;
+  lastUpdateTime = currentUpdateTime;
+
+}
+
+void interruptUpdateEncoderA() {
+  return
+}
+
+void interruptUpdateEncoderB() {
+  return
+}
+
 
 void setup() {
   Serial.begin(115200);

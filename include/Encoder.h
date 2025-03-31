@@ -3,37 +3,37 @@
 
 #include <Arduino.h>
 
+/*
+ENCODER CLASS
 
+Notably, the encoder class will have to be split up. This is due to my
+inexperience with class instances and that whole can of warms. The state
+of both encoders will be global variables that will be changed with the
+help of this class.
+
+Most method calls will require passing in the current count,
+and will purely handle so
+
+
+*/
 class Encoder {
-    private:
-        const uint8_t pinA;
-        const uint8_t pinB;
-        const uint16_t pulsesPerRev;
-        const unsigned long velocity_update_period_us;
-        
-        volatile long position = 0;
-        volatile bool lastStateA = false;
-        volatile float velocity = 0.0;
-        volatile long lastPosition = 0;
-        
-        bool useTimerThree = false;  // Flag to select Timer3 instead of Timer1
-        
-        static void isrWrapper();
-        static void timer1IsrWrapper();
-        static void timer3IsrWrapper();
-        
-        void handleInterrupt();
-        void updateVelocity();
-    
+
     public:
-        Encoder(uint8_t encoderPinA, uint8_t encoderPinB, uint16_t ppr, unsigned long velocity_update_period_us, bool useTimer3 = false);
+        Encoder();
         
         void begin();
+
+        int encoderUpdateInterrupt(bool lastStateA, 
+            bool currentStateA, bool currentStateB);
+
+        void updateVelocity(long currentPosition,
+            long lastPosition, uint32_t currentUpdateTime, uint32_t lastUpdateTime);
         
         float getVelocity();
-        
-        long getPosition();
-        
-        static Encoder* instance;
+
+    private:
+    // Velocity will be handled by the object as we can just keep passing
+    // the positions into it
+        volatile float velocity = 0.0;
 };
 #endif // ENCODER_H
