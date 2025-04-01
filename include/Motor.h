@@ -7,6 +7,8 @@ class Motor {
 public:
     Motor(uint8_t pwmPin);
     void setPWM(float pwmSignal);
+private:
+    uint8_t pwmPin;
 };
 
 #endif // MOTOR_H
