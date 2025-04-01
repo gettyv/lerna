@@ -5,10 +5,10 @@
 #include <Constants.h>
 
 Encoder::Encoder(){
-    return
+    return;
 }
 
-void Encoder::begin() {return}
+void Encoder::begin() {return;}
 
 int Encoder::encoderUpdateInterrupt(bool lastStateA, bool currentStateA, bool currentStateB) {
     int valToIncrement = NULL;

@@ -1,7 +1,10 @@
 #include <Arduino.h>
 #include <ArduinoLog.h>
 #include <Encoder.h>
-#include <constants.h>
+#include <Constants.h>
+#include <TimerOne.h>
+
+TimerOne timer;
 
 // Encoders and state
 uint32_t lastUpdateTime = NULL;
@@ -20,7 +23,7 @@ long encoderALastPosition = 0;
 long encoderBLastPosition = 0;
 
 // ISR that should be called routinely by the timer
-void timerUpdateEncoderVelocity() {
+void updateEncoderVelocity() {
   currentUpdateTime = micros();
 
   encoderMotorA.updateVelocity(encoderAPosition, 
@@ -35,39 +38,54 @@ void timerUpdateEncoderVelocity() {
 }
 
 void interruptUpdateEncoderA() {
-  return
+  bool currentStateA = digitalRead(MOTOR1_ENCODER_PIN_A);
+  bool currentStateB = digitalRead(MOTOR1_ENCODER_PIN_B);
+
+  encoderAPosition += encoderMotorA.encoderUpdateInterrupt(
+    encoderALastStateA, currentStateA, currentStateB);
+
+  encoderALastStateA = currentStateA;
 }
 
 void interruptUpdateEncoderB() {
-  return
+  bool currentStateA = digitalRead(MOTOR2_ENCODER_PIN_A);
+  bool currentStateB = digitalRead(MOTOR2_ENCODER_PIN_B);
+
+  encoderBPosition += encoderMotorB.encoderUpdateInterrupt(
+    encoderBLastStateA, currentStateA, currentStateB);
+
+  encoderBLastStateA = currentStateA;
+}
+
+// Where the magic happens!
+void ctrlf() {
+  Serial.println("Control Function Called");
+  updateEncoderVelocity();
+  Serial.println("Updated Velocities");
 }
 
 
 void setup() {
   Serial.begin(115200);
-  Log.begin(LOG_LEVEL_VERBOSE, &Serial, true);
-  Log.noticeln("Setup");
+  Serial.println("Beginning Setup");
 
-  Log.noticeln("Encoder setup");
-  encoder.begin();
-  Log.noticeln("Encoder setup complete.");
+  // Encoders should likely be setup last due to their use of interrupts
+  Serial.println("Starting Up Encoders, interrupts, and timer");
+  encoderMotorA.begin();
+  encoderMotorB.begin();
 
-  Log.noticeln("Setup complete.");
-  pinMode(36, INPUT_PULLUP);
-  attachInterrupt(digitalPinToInterrupt(36), []() {
-    Serial.println("Interrupt triggered on pin 36");
-  }, CHANGE);
+  attachInterrupt(MOTOR1_ENCODER_PIN_A, interruptUpdateEncoderA, CHANGE);
+  attachInterrupt(MOTOR2_ENCODER_PIN_A, interruptUpdateEncoderB, CHANGE);
+
+  // Attach control function to timer
+  Serial.println("Attaching Timer");
+  timer.initialize(CONTROL_FUNCTION_PERIOD_US);
+  timer.attachInterrupt(ctrlf);
+
+  Serial.println("Begin the timer");
+  timer.start();
 }
 
 void loop() {
-  Log.noticeln("Loop");
-  delay(1000);
-  Serial.println("Position: " + String(encoder.getPosition()));
-  Serial.println("Velocity: " + String(encoder.getVelocity()));
-  Serial.println("DigitalRead: " + String(digitalRead(MOTOR1_ENCODER_PIN_A)));
-
-
-  // Log.noticeln("Position: %ld", encoder.getPosition());
-  // Log.noticeln("Velocity: %f", encoder.getVelocity());
-  
+  // Nothing to see here :0  
 }

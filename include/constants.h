@@ -23,7 +23,7 @@ timer if we want.
 
 // Encoders
 const float ENCODER_PPR = 211.2;
-const uint16_t ENCODER_VEL_UPDATE_PERIOD_US = 1000; // 1ms
+const uint16_t CONTROL_FUNCTION_PERIOD_US = 1000; // 1ms
 
 
 // Pins
