@@ -36,19 +36,19 @@ const float MOTORB_KD = 0.0;
 
 // Pins
 
-// Motor 1
-const uint8_t MOTOR1_PWM_PIN = 44;
-const uint8_t MOTOR1_ENCODER_PIN_A = 22;
-const uint8_t MOTOR1_ENCODER_PIN_B = 23;
-const uint8_t MOTOR1_CW_A_PIN = 24;
-const uint8_t MOTOR1_CCW_B_PIN = 25;
+// Motor A
+const uint8_t MOTORA_PWM_PIN = 44;
+const uint8_t MOTORA_ENCODER_PIN_A = 22;
+const uint8_t MOTORA_ENCODER_PIN_B = 23;
+const uint8_t MOTORA_CW_A_PIN = 24;
+const uint8_t MOTORA_CCW_B_PIN = 25;
 
-// Motor 2
-const uint8_t MOTOR2_PWM_PIN = 45;
-const uint8_t MOTOR2_ENCODER_PIN_A = 26;
-const uint8_t MOTOR2_ENCODER_PIN_B = 27;
-const uint8_t MOTOR2_CW_A_PIN = 28;
-const uint8_t MOTOR2_CCW_B_PIN = 29;
+// Motor B
+const uint8_t MOTORB_PWM_PIN = 45;
+const uint8_t MOTORB_ENCODER_PIN_A = 26;
+const uint8_t MOTORB_ENCODER_PIN_B = 27;
+const uint8_t MOTORB_CW_A_PIN = 28;
+const uint8_t MOTORB_CCW_B_PIN = 29;
 
 // LED Strip 1
 const uint8_t LED_STRIP1_DATA_PIN = 6;

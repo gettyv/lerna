@@ -3,8 +3,14 @@
 #include <Encoder.h>
 #include <Constants.h>
 #include <TimerOne.h>
+#include <Motor.h>
+#include <PID.h>
 
 TimerOne timer;
+Motor motorA(MOTORA_PWM_PIN);
+Motor motorB(MOTORB_PWM_PIN);
+PID pidA(MOTORA_KP, MOTORA_KI, MOTORA_KD);
+PID pidB(MOTORB_KP, MOTORB_KI, MOTORB_KD);
 
 // Encoders and state
 uint32_t lastUpdateTime = NULL;
@@ -38,9 +44,8 @@ void updateEncoderVelocity() {
 }
 
 void interruptUpdateEncoderA() {
-  bool currentStateA = digitalRead(MOTOR1_ENCODER_PIN_A);
-  bool currentStateB = digitalRead(MOTOR1_ENCODER_PIN_B);
-
+  bool currentStateA = digitalRead(MOTORA_ENCODER_PIN_A);
+  bool currentStateB = digitalRead(MOTORA_ENCODER_PIN_B);
   encoderAPosition += encoderMotorA.encoderUpdateInterrupt(
     encoderALastStateA, currentStateA, currentStateB);
 
@@ -48,8 +53,8 @@ void interruptUpdateEncoderA() {
 }
 
 void interruptUpdateEncoderB() {
-  bool currentStateA = digitalRead(MOTOR2_ENCODER_PIN_A);
-  bool currentStateB = digitalRead(MOTOR2_ENCODER_PIN_B);
+  bool currentStateA = digitalRead(MOTORB_ENCODER_PIN_A);
+  bool currentStateB = digitalRead(MOTORB_ENCODER_PIN_B);
 
   encoderBPosition += encoderMotorB.encoderUpdateInterrupt(
     encoderBLastStateA, currentStateA, currentStateB);
@@ -60,8 +65,19 @@ void interruptUpdateEncoderB() {
 // Where the magic happens!
 void ctrlf() {
   Serial.println("Control Function Called");
+
   updateEncoderVelocity();
   Serial.println("Updated Velocities");
+
+  float motorAVelocity = encoderMotorA.getVelocity();
+  float pidACommand = pidA.step(motorAVelocity);
+  motorA.setPWM(pidACommand);
+  Serial.println("Updated Motor A Command");
+
+  float motorBVelocity = encoderMotorB.getVelocity();
+  float pidBCommand = pidB.step(motorBVelocity);
+  motorB.setPWM(pidBCommand);
+  Serial.println("Updated Motor B Command");
 }
 
 
@@ -74,13 +90,16 @@ void setup() {
   encoderMotorA.begin();
   encoderMotorB.begin();
 
-  attachInterrupt(MOTOR1_ENCODER_PIN_A, interruptUpdateEncoderA, CHANGE);
-  attachInterrupt(MOTOR2_ENCODER_PIN_A, interruptUpdateEncoderB, CHANGE);
+  attachInterrupt(MOTORA_ENCODER_PIN_A, interruptUpdateEncoderA, CHANGE);
+  attachInterrupt(MOTORB_ENCODER_PIN_A, interruptUpdateEncoderB, CHANGE);
 
   // Attach control function to timer
   Serial.println("Attaching Timer");
   timer.initialize(CONTROL_FUNCTION_PERIOD_US);
   timer.attachInterrupt(ctrlf);
+
+  Serial.println("Prepare Global State");
+  lastUpdateTime = micros();
 
   Serial.println("Begin the timer");
   timer.start();
