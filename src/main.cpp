@@ -44,13 +44,13 @@ void updateEncoderVelocity() {
 }
 
 void interruptUpdateEncoderA() {
-  Serial.println("Interrupt Update Encoder A Called");
+  // Serial.println("Interrupt Update Encoder A Called");
   bool currentStateA = digitalRead(MOTORA_ENCODER_PIN_A);
   bool currentStateB = digitalRead(MOTORA_ENCODER_PIN_B);
-  Serial.print("Current State A: ");
-  Serial.println(currentStateA);
-  Serial.print("Current State B: ");
-  Serial.println(currentStateB);
+  // Serial.print("Current State A: ");
+  // Serial.println(currentStateA);
+  // Serial.print("Current State B: ");
+  // Serial.println(currentStateB);
   encoderAPosition += encoderMotorA.encoderUpdateInterrupt(
     encoderALastStateA, currentStateA, currentStateB);
 
@@ -118,7 +118,7 @@ void setup() {
   pinMode(MOTORB_PWM_PIN, OUTPUT);
   pinMode(MOTORA_CW_A_PIN, OUTPUT);
   pinMode(MOTORA_CCW_B_PIN, OUTPUT);
-  
+
   digitalWrite(MOTORA_CW_A_PIN, HIGH);
   digitalWrite(MOTORA_CCW_B_PIN, LOW);
   analogWrite(MOTORA_PWM_PIN, 0.2*255);
