@@ -112,6 +112,11 @@ void setup() {
 
   // Serial.println("Begin the timer");
   // timer.start();
+
+  Serial.println("Setting test PWM signal to 0.2");
+  pinMode(MOTORA_PWM_PIN, OUTPUT);
+  pinMode(MOTORB_PWM_PIN, OUTPUT);
+  analogWrite(MOTORA_PWM_PIN, 0.2*255);
 }
 
 void loop() {

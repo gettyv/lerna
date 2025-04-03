@@ -22,7 +22,7 @@ timer if we want.
 #include <Arduino.h>
 
 // Encoders
-const float ENCODER_PPR = 211.2;
+const float ENCODER_PPR = 48;
 const uint16_t CONTROL_FUNCTION_PERIOD_US = 1000; // 1ms
 
 // Controllers
