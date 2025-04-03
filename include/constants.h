@@ -38,15 +38,15 @@ const float MOTORB_KD = 0.0;
 
 // Motor A
 const uint8_t MOTORA_PWM_PIN = 44;
-const uint8_t MOTORA_ENCODER_PIN_A = 22;
-const uint8_t MOTORA_ENCODER_PIN_B = 23;
+const uint8_t MOTORA_ENCODER_PIN_A = 2;
+const uint8_t MOTORA_ENCODER_PIN_B = 4;
 const uint8_t MOTORA_CW_A_PIN = 24;
 const uint8_t MOTORA_CCW_B_PIN = 25;
 
 // Motor B
 const uint8_t MOTORB_PWM_PIN = 45;
-const uint8_t MOTORB_ENCODER_PIN_A = 26;
-const uint8_t MOTORB_ENCODER_PIN_B = 27;
+const uint8_t MOTORB_ENCODER_PIN_A = 3;
+const uint8_t MOTORB_ENCODER_PIN_B = 5;
 const uint8_t MOTORB_CW_A_PIN = 28;
 const uint8_t MOTORB_CCW_B_PIN = 29;
 
