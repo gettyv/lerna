@@ -44,8 +44,13 @@ void updateEncoderVelocity() {
 }
 
 void interruptUpdateEncoderA() {
+  Serial.println("Interrupt Update Encoder A Called");
   bool currentStateA = digitalRead(MOTORA_ENCODER_PIN_A);
   bool currentStateB = digitalRead(MOTORA_ENCODER_PIN_B);
+  Serial.print("Current State A: ");
+  Serial.println(currentStateA);
+  Serial.print("Current State B: ");
+  Serial.println(currentStateB);
   encoderAPosition += encoderMotorA.encoderUpdateInterrupt(
     encoderALastStateA, currentStateA, currentStateB);
 
@@ -82,7 +87,7 @@ void interruptUpdateEncoderA() {
 
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(9600);
   Serial.println("Beginning Setup");
 
   // Encoders should likely be setup last due to their use of interrupts
@@ -113,5 +118,5 @@ void loop() {
   Serial.println(encoderAPosition);
   Serial.print("Encoder A Velocity: ");
   Serial.println(encoderMotorA.getVelocity());
-  
+
 }
