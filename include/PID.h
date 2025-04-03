@@ -7,12 +7,19 @@ class PID {
 
         float step(float reading);
 
-        float setRef(float ref);
+        void setRef(float ref);
 
     private:
         float accumulator;
         float error;
-        float lastUpdateTime;
+        float lastError;
+        float lastUpdateTime = -1;
+        float ref;
+
+        float Kp;
+        float Ki;
+        float Kd;
+
 };
 
 
