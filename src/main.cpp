@@ -92,9 +92,13 @@ void setup() {
 
   // Encoders should likely be setup last due to their use of interrupts
   Serial.println("Starting Up Encoders, interrupts, and timer");
+  pinMode(MOTORA_ENCODER_PIN_A, INPUT_PULLUP);
+  pinMode(MOTORA_ENCODER_PIN_B, INPUT_PULLUP);
   encoderMotorA.begin();
   // encoderMotorB.begin();
 
+  encoderALastStateA = digitalRead(MOTORA_ENCODER_PIN_A);
+  // encoderBLastStateA = digitalRead(MOTORB_ENCODER_PIN_A);
   attachInterrupt(MOTORA_ENCODER_PIN_A, interruptUpdateEncoderA, CHANGE);
   // attachInterrupt(MOTORB_ENCODER_PIN_A, interruptUpdateEncoderB, CHANGE);
 
