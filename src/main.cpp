@@ -116,6 +116,11 @@ void setup() {
   Serial.println("Setting test PWM signal to 0.2");
   pinMode(MOTORA_PWM_PIN, OUTPUT);
   pinMode(MOTORB_PWM_PIN, OUTPUT);
+  pinMode(MOTORA_CW_A_PIN, OUTPUT);
+  pinMode(MOTORA_CCW_B_PIN, OUTPUT);
+  
+  digitalWrite(MOTORA_CW_A_PIN, HIGH);
+  digitalWrite(MOTORA_CCW_B_PIN, LOW);
   analogWrite(MOTORA_PWM_PIN, 0.2*255);
 }
 
