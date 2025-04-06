@@ -3,30 +3,28 @@
 #include <Arduino.h>
 #include <Constants.h>
 
-LedStrip::LedStrip() {}
-
 void LedStrip::begin() {
-    FastLED.addLeds<WS2812, LEDS_1_DATA_PIN, GRB>(leds, LEDS_1_NUM);
+    FastLED.addLeds<WS2812, GRB>(leds, numLeds);
     clear();
 }
 
 void LedStrip::updateRainbow() {
-    for (int i = 0; i < LEDS_1_NUM; i++) {
+    for (int i = 0; i < numLeds; i++) {
         leds[i] = CHSV(hue + (i * 10), 255, 255);
     }
     hue++;
 }
 
 void LedStrip::updateSparkle() {
-    int pos = random(LEDS_1_NUM);
+    int pos = random(numLeds);
     leds[pos] = CRGB::White;
 }
 
 void LedStrip::fadeLeds(uint8_t fadeBy) {
-   fadeToBlackBy(leds, LEDS_1_NUM, fadeBy);
+   fadeToBlackBy(leds, numLeds, fadeBy);
 }
 
 void LedStrip::clear() {
-    fill_solid(leds, LEDS_1_NUM, CRGB::Black);
+    fill_solid(leds, numLeds, CRGB::Black);
     FastLED.show();
 }

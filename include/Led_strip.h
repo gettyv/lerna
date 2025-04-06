@@ -9,7 +9,10 @@
 
 class LedStrip {
 public:
-    LedStrip();
+    LedStrip(uint16_t numLeds, uint8_t dataPin) : numLeds(numLeds), dataPin(dataPin) {
+        leds = new CRGB[numLeds];
+        hue = 0;
+    };
     void begin();
     void updateRainbow();
     void updateSparkle();
@@ -22,7 +25,9 @@ public:
     void clear();
 
 private:
-    CRGB leds[LEDS_1_NUM];
+    CRGB* leds;
+    uint16_t numLeds;
+    uint8_t dataPin;
     uint8_t hue;
 
 };

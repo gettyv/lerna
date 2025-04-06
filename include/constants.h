@@ -22,8 +22,11 @@ timer if we want.
 #include <Arduino.h>
 
 // LEDs
-#define LEDS_1_NUM 300
-#define LEDS_1_DATA_PIN 6
+const int FOX_TOWER_LEDS = 12;
+const int FOX_1_LEDS_DATA_PIN = 6;
+const int FOX_2_LEDS_DATA_PIN = 7;
+const int FOX_3_LEDS_DATA_PIN = 8;
+const int FOX_4_LEDS_DATA_PIN = 9;
 
 // Encoders
 const float ENCODER_PPR = 48;
