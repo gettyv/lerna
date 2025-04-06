@@ -29,6 +29,9 @@ const int FOX_2_LEDS_DATA_PIN = 7;
 const int FOX_3_LEDS_DATA_PIN = 8;
 const int FOX_4_LEDS_DATA_PIN = 9;
 
+// Panel
+const String PANEL_READY_MESSAGE = "PANEL_READY";
+
 // Encoders
 const float ENCODER_PPR = 48;
 const uint16_t CONTROL_FUNCTION_PERIOD_US = 1e5; // 1ms
@@ -36,8 +39,8 @@ const uint16_t CONTROL_FUNCTION_PERIOD_US = 1e5; // 1ms
 // const float MOTORA_VEL_SETPOINT = 0.0;
 // const float MOTORB_VEL_SETPOINT = 0.0;
 
-const float MOTORA_VEL_SETPOINT = 16.0;
-const float MOTORB_VEL_SETPOINT = 16.0;
+const float MOTORA_VEL_SETPOINT = 3.0;
+const float MOTORB_VEL_SETPOINT = 3.0;
 
 // Controllers
 const float MOTORA_KP = 0.03;
