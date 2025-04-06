@@ -22,6 +22,7 @@ timer if we want.
 #include <Arduino.h>
 
 // LEDs
+const int FOX_TOWER_STRIPS = 2;
 const int FOX_TOWER_LEDS = 12;
 const int FOX_1_LEDS_DATA_PIN = 6;
 const int FOX_2_LEDS_DATA_PIN = 7;
@@ -32,18 +33,19 @@ const int FOX_4_LEDS_DATA_PIN = 9;
 const float ENCODER_PPR = 48;
 const uint16_t CONTROL_FUNCTION_PERIOD_US = 1e5; // 1ms
 
-const float MOTORA_VEL_SETPOINT = 1.0;
-const float MOTORB_VEL_SETPOINT = 1.0;
-const float MOTORA_ERROR_P = 0.1;
-const float MOTORB_ERROR_P = 0.1;
+// const float MOTORA_VEL_SETPOINT = 0.0;
+// const float MOTORB_VEL_SETPOINT = 0.0;
+
+const float MOTORA_VEL_SETPOINT = 16.0;
+const float MOTORB_VEL_SETPOINT = 16.0;
 
 // Controllers
-const float MOTORA_KP = 0.4;
-const float MOTORA_KI = 0.0;
+const float MOTORA_KP = 0.03;
+const float MOTORA_KI = 0.01;
 const float MOTORA_KD = 0.0;
 
-const float MOTORB_KP = 0.4;
-const float MOTORB_KI = 0.0;
+const float MOTORB_KP = 0.03;
+const float MOTORB_KI = 0.01;
 const float MOTORB_KD = 0.0;
 
 // Pins

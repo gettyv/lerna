@@ -11,7 +11,7 @@
 Motor motorA(MOTORA_PWM_PIN, MOTORA_CW_A_PIN, MOTORA_CCW_B_PIN);
 Motor motorB(MOTORB_PWM_PIN, MOTORB_CW_A_PIN, MOTORB_CCW_B_PIN);
 
-LedStrip* foxTowerLeds[4];
+LedStrip* foxTowerLeds[FOX_TOWER_STRIPS];
 
 int ledPattern = 0;
 
@@ -24,6 +24,7 @@ volatile uint32_t currentUpdateTime = NULL;
 
 // This is zero, so we will almost certainly immediately run motor update
 uint32_t lastLoopTime = 0;
+uint32_t currentLoopTime = 0;
 
 Encoder encoderMotorA;
 Encoder encoderMotorB;
@@ -102,14 +103,12 @@ void setup() {
   Serial.println("Beginning Setup");
 
   Serial.println("Starting FOX LED Strips");
-  foxTowerLeds[0] = new LedStrip(FOX_TOWER_LEDS, FOX_1_LEDS_DATA_PIN);
-  foxTowerLeds[1] = new LedStrip(FOX_TOWER_LEDS, FOX_2_LEDS_DATA_PIN);
-  foxTowerLeds[2] = new LedStrip(FOX_TOWER_LEDS, FOX_3_LEDS_DATA_PIN);
-  foxTowerLeds[3] = new LedStrip(FOX_TOWER_LEDS, FOX_4_LEDS_DATA_PIN);
+  // foxTowerLeds[0] = new LedStrip(FOX_TOWER_LEDS, FOX_1_LEDS_DATA_PIN);
+  // foxTowerLeds[1] = new LedStrip(FOX_TOWER_LEDS, FOX_2_LEDS_DATA_PIN);
 
-  for (int i = 0; i < 4; i++) {
-    foxTowerLeds[i]->begin();
-  }
+  // for (int i = 0; i < FOX_TOWER_STRIPS; i++) {
+  //   foxTowerLeds[i]->begin();
+  // }
 
   // Encoders should likely be setup last due to their use of interrupts
   Serial.println("Starting Up Encoders, interrupts, and timer");
@@ -122,6 +121,12 @@ void setup() {
   encoderBLastStateA = digitalRead(MOTORB_ENCODER_PIN_A);
   attachInterrupt(digitalPinToInterrupt(MOTORA_ENCODER_PIN_A), interruptUpdateEncoderA, CHANGE);
   attachInterrupt(digitalPinToInterrupt(MOTORB_ENCODER_PIN_A), interruptUpdateEncoderB, CHANGE);
+
+  // Setting up PID
+  Serial.println("Setting up PID Controllers");
+  pidA.setRef(MOTORA_VEL_SETPOINT);
+  pidB.setRef(MOTORB_VEL_SETPOINT);
+
 
   Serial.println("Prepare Global State");
   lastUpdateTime = micros();
@@ -138,20 +143,21 @@ void setup() {
 
   // Log Header
   Serial.println(
-    "time, motorAPosition, motorBPosition, motorAVelocity, motorBVelocity, motorACommand, motorBCommand");
+    "poutA, ioutA, doutA, errorA, accumA, poutB, ioutB, doutB, errorB, accumB,time, motorAPosition, motorBPosition, motorAVelocity, motorBVelocity, motorACommand, motorBCommand");
 }
 
 void loop() {
-  unsigned long currentLoopTime = micros();
+  currentLoopTime = micros();
+  // Serial.println(currentLoopTime);
 
   // LED update
   switch (ledPattern) {
   case 0:
-    EVERY_N_MILLISECONDS(LED_RAINBOW_DELAY_US / 1000) {
-      for (int i = 0; i < 4; i++) {
-        foxTowerLeds[i]->updateRainbow();
-      }
-    }
+    // EVERY_N_MILLISECONDS(LED_RAINBOW_DELAY_US / 1000) {
+    //   for (int i = 0; i < FOX_TOWER_STRIPS; i++) {
+    //     foxTowerLeds[i]->updateRainbow();
+    //   }
+    // }
     break;
   case 1:
     // EVERY_N_MILLISECONDS(LED_NEW_SPARKLE_US / 1000) {
@@ -166,9 +172,9 @@ void loop() {
     break;
   }
   
-  for (int i = 0; i < 4; i++) {
-    foxTowerLeds[i]->showLeds();
-  }
+  // for (int i = 0; i < FOX_TOWER_STRIPS; i++) {
+  //   foxTowerLeds[i]->showLeds();
+  // }
 
   // EVERY_N_SECONDS(LED_ANIMATION_SWITCH_S) {
   //   ledPattern++;
@@ -210,7 +216,8 @@ void loop() {
     Serial.print(", ");
     Serial.print(pidBCommand);
     Serial.println("");
+    lastLoopTime = currentLoopTime;
   }
 
-  lastLoopTime = currentLoopTime;
+  
 }
