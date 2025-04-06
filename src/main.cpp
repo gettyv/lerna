@@ -16,6 +16,9 @@ PID pidB(MOTORB_KP, MOTORB_KI, MOTORB_KD);
 volatile uint32_t lastUpdateTime = NULL;
 volatile uint32_t currentUpdateTime = NULL;
 
+// This is zero, so we will almost certainly immediately run motor update
+uint32_t lastLoopTime = 0;
+
 Encoder encoderMotorA;
 Encoder encoderMotorB;
 
@@ -130,62 +133,67 @@ void setup() {
 }
 
 void loop() {
-  updateEncoderVelocity();
+  unsigned long currentLoopTime = micros();
 
-  noInterrupts();
-  long currentEncoderAPosition = encoderAPosition;
-  long currentEncoderBPosition = encoderBPosition;
-  interrupts();
+  // LED update
 
-  float errorA = MOTORA_VEL_SETPOINT - encoderMotorA.getVelocity();
-  float commandA = MOTORA_ERROR_P * errorA;
-  if (commandA > 255) commandA = 255;
-  if (commandA < 0) commandA = 0;
-  analogWrite(MOTORA_PWM_PIN, commandA);
+  if (currentLoopTime - lastLoopTime > CONTROL_FUNCTION_PERIOD_US) {
+    updateEncoderVelocity();
 
-  float motorAVelocity = encoderMotorA.getVelocity();
-  float pidACommand = pidA.step(motorAVelocity);
-  if (pidACommand > 255) pidACommand = 255;
-  if (pidACommand >= 0) {
-    // Counter-clockwise is positive
-    digitalWrite(MOTORA_CW_A_PIN, LOW);
-    digitalWrite(MOTORA_CCW_B_PIN, HIGH);
-  } else {
-    digitalWrite(MOTORA_CW_A_PIN, HIGH);
-    digitalWrite(MOTORA_CCW_B_PIN, LOW);
+    noInterrupts();
+    long currentEncoderAPosition = encoderAPosition;
+    long currentEncoderBPosition = encoderBPosition;
+    interrupts();
+
+    float errorA = MOTORA_VEL_SETPOINT - encoderMotorA.getVelocity();
+    float commandA = MOTORA_ERROR_P * errorA;
+    if (commandA > 255) commandA = 255;
+    if (commandA < 0) commandA = 0;
+    analogWrite(MOTORA_PWM_PIN, commandA);
+
+    float motorAVelocity = encoderMotorA.getVelocity();
+    float pidACommand = pidA.step(motorAVelocity);
+    if (pidACommand > 255) pidACommand = 255;
+    if (pidACommand >= 0) {
+      // Counter-clockwise is positive
+      digitalWrite(MOTORA_CW_A_PIN, LOW);
+      digitalWrite(MOTORA_CCW_B_PIN, HIGH);
+    } else {
+      digitalWrite(MOTORA_CW_A_PIN, HIGH);
+      digitalWrite(MOTORA_CCW_B_PIN, LOW);
+    }
+    analogWrite(MOTORA_PWM_PIN, abs(pidACommand));
+    Serial.println("Updated Motor A Command");
+
+    float motorBVelocity = encoderMotorB.getVelocity();
+    float pidBCommand = pidB.step(motorBVelocity);
+    if (pidBCommand > 255) pidBCommand = 255;
+    if (pidBCommand >= 0) {
+      // Counter-clockwise is positive
+      digitalWrite(MOTORB_CW_A_PIN, LOW);
+      digitalWrite(MOTORB_CCW_B_PIN, HIGH);
+    } else {
+      digitalWrite(MOTORB_CW_A_PIN, HIGH);
+      digitalWrite(MOTORB_CCW_B_PIN, LOW);
+    }
+    analogWrite(MOTORB_PWM_PIN, abs(pidBCommand));
+
+    // Logging
+    Serial.print(micros());
+    Serial.print(", ");
+    Serial.print(currentEncoderAPosition);
+    Serial.print(", ");
+    Serial.print(currentEncoderBPosition);
+    Serial.print(", ");
+    Serial.print(motorAVelocity);
+    Serial.print(", ");
+    Serial.print(motorBVelocity);
+    Serial.print(", ");
+    Serial.print(pidACommand);
+    Serial.print(", ");
+    Serial.print(pidBCommand);
+    Serial.println("");
   }
-  analogWrite(MOTORA_PWM_PIN, abs(pidACommand));
-  Serial.println("Updated Motor A Command");
 
-  float motorBVelocity = encoderMotorB.getVelocity();
-  float pidBCommand = pidB.step(motorBVelocity);
-  if (pidBCommand > 255) pidBCommand = 255;
-  if (pidBCommand >= 0) {
-    // Counter-clockwise is positive
-    digitalWrite(MOTORB_CW_A_PIN, LOW);
-    digitalWrite(MOTORB_CCW_B_PIN, HIGH);
-  } else {
-    digitalWrite(MOTORB_CW_A_PIN, HIGH);
-    digitalWrite(MOTORB_CCW_B_PIN, LOW);
-  }
-  analogWrite(MOTORB_PWM_PIN, abs(pidBCommand));
-
-  // Logging
-  Serial.print(micros());
-  Serial.print(", ");
-  Serial.print(currentEncoderAPosition);
-  Serial.print(", ");
-  Serial.print(currentEncoderBPosition);
-  Serial.print(", ");
-  Serial.print(motorAVelocity);
-  Serial.print(", ");
-  Serial.print(motorBVelocity);
-  Serial.print(", ");
-  Serial.print(pidACommand);
-  Serial.print(", ");
-  Serial.print(pidBCommand);
-  Serial.println("");
-
-  delay(2000);
-
+  lastLoopTime = currentLoopTime;
 }
