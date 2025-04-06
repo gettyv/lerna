@@ -5,10 +5,13 @@
 #include <TimerOne.h>
 #include <Motor.h>
 #include <PID.h>
+#include <Led_strip.h>
 
 // TimerOne timer;
 // Motor motorA(MOTORA_PWM_PIN);
 // Motor motorB(MOTORB_PWM_PIN);
+LedStrip leds;
+
 PID pidA(MOTORA_KP, MOTORA_KI, MOTORA_KD);
 PID pidB(MOTORB_KP, MOTORB_KI, MOTORB_KD);
 
@@ -102,6 +105,9 @@ void setup() {
   pinMode(MOTORB_CW_A_PIN, OUTPUT);
   pinMode(MOTORB_CCW_B_PIN, OUTPUT);
 
+  Serial.println("Starting LED Strip");
+  leds.begin();
+
   // Encoders should likely be setup last due to their use of interrupts
   Serial.println("Starting Up Encoders, interrupts, and timer");
   pinMode(MOTORA_ENCODER_PIN_A, INPUT_PULLUP);
@@ -136,6 +142,8 @@ void loop() {
   unsigned long currentLoopTime = micros();
 
   // LED update
+
+  leds.playRainbow();
 
   if (currentLoopTime - lastLoopTime > CONTROL_FUNCTION_PERIOD_US) {
     updateEncoderVelocity();

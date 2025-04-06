@@ -21,9 +21,13 @@ timer if we want.
 #define CONSTANTS_H
 #include <Arduino.h>
 
+// LEDs
+#define NUM_LEDS 300
+#define LED_DATA_PIN 6
+
 // Encoders
 const float ENCODER_PPR = 48;
-const uint16_t CONTROL_FUNCTION_PERIOD_US = 1000; // 1ms
+const uint16_t CONTROL_FUNCTION_PERIOD_US = 1e5; // 1ms
 
 const float MOTORA_VEL_SETPOINT = 1.0;
 const float MOTORB_VEL_SETPOINT = 1.0;
@@ -55,9 +59,8 @@ const uint8_t MOTORB_ENCODER_PIN_B = 5;
 const uint8_t MOTORB_CW_A_PIN = 28;
 const uint8_t MOTORB_CCW_B_PIN = 29;
 
-// LED Strip 1
-const uint8_t LED_STRIP1_DATA_PIN = 6;
-const uint16_t LED_STRIP1_NUM_PIXELS = 300;
+// Animations
+const int LED_RAINBOW_DELAY_US = 20e3;
 
 
 #endif
