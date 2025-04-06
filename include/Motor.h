@@ -4,11 +4,19 @@
 #include <stdint.h>
 
 class Motor {
-public:
-    Motor(uint8_t pwmPin);
-    void setPWM(float pwmSignal);
-private:
-    uint8_t pwmPin;
+    public:
+        Motor(uint8_t pwmPin, uint8_t cwPin, uint8_t ccwPin) : pwmPin(pwmPin), cwPin(cwPin), ccwPin(ccwPin) {
+            pinMode(pwmPin, OUTPUT);
+            pinMode(cwPin, OUTPUT);
+            pinMode(ccwPin, OUTPUT);
+        }
+        void setSpeed(float command);
+
+    private:
+        uint8_t pwmPin;
+        uint8_t cwPin;
+        uint8_t ccwPin;
+
 };
 
 #endif // MOTOR_H

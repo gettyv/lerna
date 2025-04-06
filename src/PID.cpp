@@ -41,6 +41,9 @@ float PID::step(float reading) {
     }
 
     lastError = error;
+    float output = Pout + Iout + Dout;
+    // Clamp the output to a range of -255 to 255
+    output = constrain(output, -255, 255);
 
-    return Pout + Iout + Dout;
+    return output;
 }

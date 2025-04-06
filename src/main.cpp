@@ -8,8 +8,9 @@
 #include <Led_strip.h>
 
 // TimerOne timer;
-// Motor motorA(MOTORA_PWM_PIN);
-// Motor motorB(MOTORB_PWM_PIN);
+Motor motorA(MOTORA_PWM_PIN, MOTORA_CW_A_PIN, MOTORA_CCW_B_PIN);
+Motor motorB(MOTORB_PWM_PIN, MOTORB_CW_A_PIN, MOTORB_CCW_B_PIN);
+
 LedStrip leds;
 
 PID pidA(MOTORA_KP, MOTORA_KI, MOTORA_KD);
@@ -153,38 +154,13 @@ void loop() {
     long currentEncoderBPosition = encoderBPosition;
     interrupts();
 
-    float errorA = MOTORA_VEL_SETPOINT - encoderMotorA.getVelocity();
-    float commandA = MOTORA_ERROR_P * errorA;
-    if (commandA > 255) commandA = 255;
-    if (commandA < 0) commandA = 0;
-    analogWrite(MOTORA_PWM_PIN, commandA);
-
     float motorAVelocity = encoderMotorA.getVelocity();
     float pidACommand = pidA.step(motorAVelocity);
-    if (pidACommand > 255) pidACommand = 255;
-    if (pidACommand >= 0) {
-      // Counter-clockwise is positive
-      digitalWrite(MOTORA_CW_A_PIN, LOW);
-      digitalWrite(MOTORA_CCW_B_PIN, HIGH);
-    } else {
-      digitalWrite(MOTORA_CW_A_PIN, HIGH);
-      digitalWrite(MOTORA_CCW_B_PIN, LOW);
-    }
-    analogWrite(MOTORA_PWM_PIN, abs(pidACommand));
-    Serial.println("Updated Motor A Command");
+    motorA.setSpeed(pidACommand);
 
     float motorBVelocity = encoderMotorB.getVelocity();
     float pidBCommand = pidB.step(motorBVelocity);
-    if (pidBCommand > 255) pidBCommand = 255;
-    if (pidBCommand >= 0) {
-      // Counter-clockwise is positive
-      digitalWrite(MOTORB_CW_A_PIN, LOW);
-      digitalWrite(MOTORB_CCW_B_PIN, HIGH);
-    } else {
-      digitalWrite(MOTORB_CW_A_PIN, HIGH);
-      digitalWrite(MOTORB_CCW_B_PIN, LOW);
-    }
-    analogWrite(MOTORB_PWM_PIN, abs(pidBCommand));
+    motorB.setSpeed(pidBCommand);
 
     // Logging
     Serial.print(micros());
