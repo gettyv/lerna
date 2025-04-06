@@ -12,14 +12,17 @@ void PID::setRef(float ref) {
 }
 
 float PID::step(float reading) {
-    long currentTime = micros(); // Get the current time in microseconds
-    float deltaTime = currentTime - lastUpdateTime;
+    long currentTime = micros();
+    float deltaTime;
 
+    // handle first call
     if (lastUpdateTime < 0) {
-        deltaTime = 1e16; // Set a large deltaTime for the first call
+        deltaTime = 0;
+        lastUpdateTime = currentTime;
+    } else {
+        deltaTime = (currentTime - lastUpdateTime) / 1.0e6; // Convert to seconds
+        lastUpdateTime = currentTime;
     }
-    
-    lastUpdateTime = currentTime;
 
     error = ref - reading;
 
@@ -30,9 +33,12 @@ float PID::step(float reading) {
     accumulator += error * deltaTime;
     float Iout = Ki * accumulator;
 
-    // Derivative term
-    float derivative = (error - lastError) / deltaTime;
-    float Dout = Kd * derivative;
+    // Derivative term (skip on the first call)
+    float Dout = 0;
+    if (deltaTime > 0) {
+        float derivative = (error - lastError) / deltaTime;
+        Dout = Kd * derivative;
+    }
 
     lastError = error;
 

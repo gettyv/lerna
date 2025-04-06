@@ -9,48 +9,50 @@
 // TimerOne timer;
 // Motor motorA(MOTORA_PWM_PIN);
 // Motor motorB(MOTORB_PWM_PIN);
-// PID pidA(MOTORA_KP, MOTORA_KI, MOTORA_KD);
-// PID pidB(MOTORB_KP, MOTORB_KI, MOTORB_KD);
+PID pidA(MOTORA_KP, MOTORA_KI, MOTORA_KD);
+PID pidB(MOTORB_KP, MOTORB_KI, MOTORB_KD);
 
 // Encoders and state
-uint32_t lastUpdateTime = NULL;
-uint32_t currentUpdateTime = NULL;
+volatile uint32_t lastUpdateTime = NULL;
+volatile uint32_t currentUpdateTime = NULL;
 
 Encoder encoderMotorA;
 Encoder encoderMotorB;
 
-bool encoderALastStateA = NULL;
-bool encoderBLastStateA = NULL;
+volatile bool encoderALastStateA = NULL;
+volatile bool encoderBLastStateA = NULL;
 
-long encoderAPosition = 0;
-long encoderBPosition = 0;
+volatile long encoderAPosition = 0;
+volatile long encoderBPosition = 0;
 
-long encoderALastPosition = 0;
-long encoderBLastPosition = 0;
+volatile long encoderALastPosition = 0;
+volatile long encoderBLastPosition = 0;
 
 // ISR that should be called routinely by the timer
 void updateEncoderVelocity() {
+
+  noInterrupts();
+  long currentEncoderAPosition = encoderAPosition;
+  long currentEncoderBPosition = encoderBPosition;
+  interrupts();
+
   currentUpdateTime = micros();
 
-  encoderMotorA.updateVelocity(encoderAPosition, 
+  encoderMotorA.updateVelocity(currentEncoderAPosition, 
     encoderALastPosition, currentUpdateTime, lastUpdateTime);
-  encoderMotorB.updateVelocity(encoderBPosition, 
+  encoderMotorB.updateVelocity(currentEncoderBPosition, 
     encoderBLastPosition, currentUpdateTime, lastUpdateTime);
 
-  encoderALastPosition = encoderAPosition;
-  encoderBLastPosition = encoderBPosition;
+  encoderALastPosition = currentEncoderAPosition;
+  encoderBLastPosition = currentEncoderBPosition;
   lastUpdateTime = currentUpdateTime;
 
 }
 
 void interruptUpdateEncoderA() {
-  // Serial.println("Interrupt Update Encoder A Called");
   bool currentStateA = digitalRead(MOTORA_ENCODER_PIN_A);
   bool currentStateB = digitalRead(MOTORA_ENCODER_PIN_B);
-  // Serial.print("Current State A: ");
-  // Serial.println(currentStateA);
-  // Serial.print("Current State B: ");
-  // Serial.println(currentStateB);
+
   encoderAPosition += encoderMotorA.encoderUpdateInterrupt(
     encoderALastStateA, currentStateA, currentStateB);
 
@@ -89,6 +91,13 @@ void interruptUpdateEncoderB() {
 void setup() {
   Serial.begin(9600);
   Serial.println("Beginning Setup");
+  
+  pinMode(MOTORA_PWM_PIN, OUTPUT);
+  pinMode(MOTORB_PWM_PIN, OUTPUT);
+  pinMode(MOTORA_CW_A_PIN, OUTPUT);
+  pinMode(MOTORA_CCW_B_PIN, OUTPUT);
+  pinMode(MOTORB_CW_A_PIN, OUTPUT);
+  pinMode(MOTORB_CCW_B_PIN, OUTPUT);
 
   // Encoders should likely be setup last due to their use of interrupts
   Serial.println("Starting Up Encoders, interrupts, and timer");
@@ -102,47 +111,80 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(MOTORA_ENCODER_PIN_A), interruptUpdateEncoderA, CHANGE);
   attachInterrupt(digitalPinToInterrupt(MOTORB_ENCODER_PIN_A), interruptUpdateEncoderB, CHANGE);
 
-  // // Attach control function to timer
-  // Serial.println("Attaching Timer");
-  // timer.initialize(CONTROL_FUNCTION_PERIOD_US);
-  // timer.attachInterrupt(ctrlf);
-
   Serial.println("Prepare Global State");
   lastUpdateTime = micros();
 
-  // Serial.println("Begin the timer");
-  // timer.start();
-
-  Serial.println("Setting test PWM signal to 0.2");
-  pinMode(MOTORA_PWM_PIN, OUTPUT);
-  pinMode(MOTORB_PWM_PIN, OUTPUT);
-  pinMode(MOTORA_CW_A_PIN, OUTPUT);
-  pinMode(MOTORA_CCW_B_PIN, OUTPUT);
-  pinMode(MOTORB_CW_A_PIN, OUTPUT);
-  pinMode(MOTORB_CCW_B_PIN, OUTPUT);
-
-  digitalWrite(MOTORA_CW_A_PIN, HIGH);
-  digitalWrite(MOTORA_CCW_B_PIN, LOW);
-  analogWrite(MOTORA_PWM_PIN, 0.2*255);
+  // Set initial states of motors
+  digitalWrite(MOTORA_CW_A_PIN, LOW);
+  digitalWrite(MOTORA_CCW_B_PIN, HIGH);
+  analogWrite(MOTORA_PWM_PIN, 0);
 
   digitalWrite(MOTORB_CW_A_PIN, LOW);
   digitalWrite(MOTORB_CCW_B_PIN, HIGH);
-  analogWrite(MOTORB_PWM_PIN, 0.2*255);
+  analogWrite(MOTORB_PWM_PIN, 0);
   Serial.println("Setup Complete");
+
+  // Log Header
+  Serial.println(
+    "time, motorAPosition, motorBPosition, motorAVelocity, motorBVelocity, motorACommand, motorBCommand");
 }
 
 void loop() {
-  // Nothing to see here :0  
   updateEncoderVelocity();
 
-  Serial.print("Encoder A Position: ");
-  Serial.println(encoderAPosition);
-  Serial.print("Encoder A Velocity: ");
-  Serial.println(encoderMotorA.getVelocity());
-  Serial.print("Encoder B Position: ");
-  Serial.println(encoderBPosition);
-  Serial.print("Encoder B Velocity: ");
-  Serial.println(encoderMotorB.getVelocity());
+  noInterrupts();
+  long currentEncoderAPosition = encoderAPosition;
+  long currentEncoderBPosition = encoderBPosition;
+  interrupts();
+
+  float errorA = MOTORA_VEL_SETPOINT - encoderMotorA.getVelocity();
+  float commandA = MOTORA_ERROR_P * errorA;
+  if (commandA > 255) commandA = 255;
+  if (commandA < 0) commandA = 0;
+  analogWrite(MOTORA_PWM_PIN, commandA);
+
+  float motorAVelocity = encoderMotorA.getVelocity();
+  float pidACommand = pidA.step(motorAVelocity);
+  if (pidACommand > 255) pidACommand = 255;
+  if (pidACommand >= 0) {
+    // Counter-clockwise is positive
+    digitalWrite(MOTORA_CW_A_PIN, LOW);
+    digitalWrite(MOTORA_CCW_B_PIN, HIGH);
+  } else {
+    digitalWrite(MOTORA_CW_A_PIN, HIGH);
+    digitalWrite(MOTORA_CCW_B_PIN, LOW);
+  }
+  analogWrite(MOTORA_PWM_PIN, abs(pidACommand));
+  Serial.println("Updated Motor A Command");
+
+  float motorBVelocity = encoderMotorB.getVelocity();
+  float pidBCommand = pidB.step(motorBVelocity);
+  if (pidBCommand > 255) pidBCommand = 255;
+  if (pidBCommand >= 0) {
+    // Counter-clockwise is positive
+    digitalWrite(MOTORB_CW_A_PIN, LOW);
+    digitalWrite(MOTORB_CCW_B_PIN, HIGH);
+  } else {
+    digitalWrite(MOTORB_CW_A_PIN, HIGH);
+    digitalWrite(MOTORB_CCW_B_PIN, LOW);
+  }
+  analogWrite(MOTORB_PWM_PIN, abs(pidBCommand));
+
+  // Logging
+  Serial.print(micros());
+  Serial.print(", ");
+  Serial.print(currentEncoderAPosition);
+  Serial.print(", ");
+  Serial.print(currentEncoderBPosition);
+  Serial.print(", ");
+  Serial.print(motorAVelocity);
+  Serial.print(", ");
+  Serial.print(motorBVelocity);
+  Serial.print(", ");
+  Serial.print(pidACommand);
+  Serial.print(", ");
+  Serial.print(pidBCommand);
+  Serial.println("");
 
   delay(2000);
 

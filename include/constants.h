@@ -25,6 +25,11 @@ timer if we want.
 const float ENCODER_PPR = 48;
 const uint16_t CONTROL_FUNCTION_PERIOD_US = 1000; // 1ms
 
+const float MOTORA_VEL_SETPOINT = 1.0;
+const float MOTORB_VEL_SETPOINT = 1.0;
+const float MOTORA_ERROR_P = 0.1;
+const float MOTORB_ERROR_P = 0.1;
+
 // Controllers
 const float MOTORA_KP = 0.4;
 const float MOTORA_KI = 0.0;
