@@ -12,6 +12,7 @@ Motor motorA(MOTORA_PWM_PIN, MOTORA_CW_A_PIN, MOTORA_CCW_B_PIN);
 Motor motorB(MOTORB_PWM_PIN, MOTORB_CW_A_PIN, MOTORB_CCW_B_PIN);
 
 LedStrip leds;
+int ledPattern = 0;
 
 PID pidA(MOTORA_KP, MOTORA_KI, MOTORA_KD);
 PID pidB(MOTORB_KP, MOTORB_KI, MOTORB_KD);
@@ -98,13 +99,6 @@ void interruptUpdateEncoderB() {
 void setup() {
   Serial.begin(9600);
   Serial.println("Beginning Setup");
-  
-  pinMode(MOTORA_PWM_PIN, OUTPUT);
-  pinMode(MOTORB_PWM_PIN, OUTPUT);
-  pinMode(MOTORA_CW_A_PIN, OUTPUT);
-  pinMode(MOTORA_CCW_B_PIN, OUTPUT);
-  pinMode(MOTORB_CW_A_PIN, OUTPUT);
-  pinMode(MOTORB_CCW_B_PIN, OUTPUT);
 
   Serial.println("Starting LED Strip");
   leds.begin();
@@ -143,8 +137,34 @@ void loop() {
   unsigned long currentLoopTime = micros();
 
   // LED update
+  switch (ledPattern) {
+  case 0:
+    EVERY_N_MILLISECONDS(LED_RAINBOW_DELAY_US / 1000) {
+      leds.updateRainbow();
+    }
+    break;
+  case 1:
+    EVERY_N_MILLISECONDS(LED_NEW_SPARKLE_US / 1000) {
+      leds.updateSparkle();
+    }
+    EVERY_N_MILLISECONDS(LED_SPARKLE_DECAY_US){
+      leds.fadeLeds(LED_SPARKLE_DECAY_AMOUNT);
+    }
 
-  leds.playRainbow();
+    break;
+  default:
+    break;
+  }
+  leds.showLeds();
+
+  EVERY_N_SECONDS(LED_ANIMATION_SWITCH_S) {
+    ledPattern++;
+    if (ledPattern > (LED_NUM_ANIMATIONS - 1)) {
+      ledPattern = 0;
+    }
+  }
+ 
+
 
   if (currentLoopTime - lastLoopTime > CONTROL_FUNCTION_PERIOD_US) {
     updateEncoderVelocity();

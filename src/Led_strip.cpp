@@ -6,35 +6,27 @@
 LedStrip::LedStrip() {}
 
 void LedStrip::begin() {
-    FastLED.addLeds<WS2812, LED_DATA_PIN, GRB>(leds, NUM_LEDS);
+    FastLED.addLeds<WS2812, LEDS_1_DATA_PIN, GRB>(leds, LEDS_1_NUM);
     clear();
 }
 
-void LedStrip::playRainbow() {
-    // skip if not enough time has passed since last update
-    if (micros() - lastUpdateTime < LED_RAINBOW_DELAY_US) {
-        return;
-    }
-
-    for (int i = 0; i < NUM_LEDS; i++) {
+void LedStrip::updateRainbow() {
+    for (int i = 0; i < LEDS_1_NUM; i++) {
         leds[i] = CHSV(hue + (i * 10), 255, 255);
     }
     hue++;
-    FastLED.show();
-    
-    lastUpdateTime = micros();
 }
 
-void LedStrip::playBlinking(CRGB color, int delayMs) {
-    fill_solid(leds, NUM_LEDS, color);
-    FastLED.show();
-    delay(delayMs);
-    clear();
-    FastLED.show();
-    delay(delayMs);
+void LedStrip::updateSparkle() {
+    int pos = random(LEDS_1_NUM);
+    leds[pos] = CRGB::White;
+}
+
+void LedStrip::fadeLeds(uint8_t fadeBy) {
+   fadeToBlackBy(leds, LEDS_1_NUM, fadeBy);
 }
 
 void LedStrip::clear() {
-    fill_solid(leds, NUM_LEDS, CRGB::Black);
+    fill_solid(leds, LEDS_1_NUM, CRGB::Black);
     FastLED.show();
 }

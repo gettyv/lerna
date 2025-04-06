@@ -11,14 +11,20 @@ class LedStrip {
 public:
     LedStrip();
     void begin();
-    void playRainbow();
-    void playBlinking(CRGB color, int delayMs);
+    void updateRainbow();
+    void updateSparkle();
+
+    void showLeds() {
+        FastLED.show();
+    }
+    void fadeLeds(uint8_t fadeBy);
+
     void clear();
 
 private:
-    CRGB leds[NUM_LEDS];
-    unsigned long lastUpdateTime = 0;
+    CRGB leds[LEDS_1_NUM];
     uint8_t hue;
+
 };
 
 #endif // LED_STRIP_H

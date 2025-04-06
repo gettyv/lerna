@@ -22,8 +22,8 @@ timer if we want.
 #include <Arduino.h>
 
 // LEDs
-#define NUM_LEDS 300
-#define LED_DATA_PIN 6
+#define LEDS_1_NUM 300
+#define LEDS_1_DATA_PIN 6
 
 // Encoders
 const float ENCODER_PPR = 48;
@@ -60,7 +60,17 @@ const uint8_t MOTORB_CW_A_PIN = 28;
 const uint8_t MOTORB_CCW_B_PIN = 29;
 
 // Animations
+const int LED_NUM_ANIMATIONS = 2;
+const int LED_ANIMATION_SWITCH_S = 5;
+
+// Rainbow
 const int LED_RAINBOW_DELAY_US = 20e3;
+
+// Sparkles
+const int LED_NEW_SPARKLE_US = 10e3;
+const int LED_SPARKLE_DECAY_US = 1e3;
+const int LED_SPARKLE_DECAY_AMOUNT = 10;
+
 
 
 #endif
