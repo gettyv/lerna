@@ -10,10 +10,6 @@ Timer5: 44, 45, 46.
 
 The plan is to use Timer 5 for motor PWM control, as we can change the PWM freq. for that
 timer if we want.
-
-
-
-
 */
 
 
@@ -39,16 +35,16 @@ const uint16_t CONTROL_FUNCTION_PERIOD_US = 1e5; // 1ms
 // const float MOTORA_VEL_SETPOINT = 0.0;
 // const float MOTORB_VEL_SETPOINT = 0.0;
 
-const float MOTORA_VEL_SETPOINT = 3.0;
+const float MOTORA_VEL_SETPOINT = -2.0;
 const float MOTORB_VEL_SETPOINT = 3.0;
 
 // Controllers
 const float MOTORA_KP = 0.03;
-const float MOTORA_KI = 0.01;
+const float MOTORA_KI = 0.04;
 const float MOTORA_KD = 0.0;
 
 const float MOTORB_KP = 0.03;
-const float MOTORB_KI = 0.01;
+const float MOTORB_KI = 0.04;
 const float MOTORB_KD = 0.0;
 
 // Pins

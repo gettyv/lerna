@@ -54,7 +54,7 @@ float PID::step(float reading) {
 
     // 0.5 is added to start in the middle range of the motor, which will then 
     // be adjusted by the PID controller
-    float output = Pout + Iout + Dout + 0.5;
+    float output = Pout + Iout + Dout;
     // Clamp the output to a range of -1.0 to 1.0
     output = constrain(output, -1.0, 1.0);
 

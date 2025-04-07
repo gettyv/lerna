@@ -153,7 +153,7 @@ void setup() {
 
   // Log Header
   panel.sendMessage(
-    "poutA, ioutA, doutA, errorA, accumA, poutB, ioutB, doutB, errorB, accumB,time, motorAPosition, motorBPosition, motorAVelocity, motorBVelocity, motorACommand, motorBCommand");
+    "time, motorAPosition, motorBPosition, motorAVelocity, motorBVelocity, motorACommand, motorBCommand");
 }
 
 void loop() {
@@ -261,7 +261,6 @@ void loop() {
 
   default:
     // Unknown command or error
-    panel.sendMessage("Unknown command received");
     break;
   }
 

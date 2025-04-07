@@ -2,6 +2,9 @@ import tkinter as tk
 from tkinter import messagebox
 import serial
 import threading
+import csv
+import os
+from datetime import datetime
 
 class ControlPanelGUI:
     def __init__(self, root):
@@ -34,6 +37,9 @@ class ControlPanelGUI:
         self.log_text = tk.Text(root, height=10, width=50, state="disabled")
         self.log_text.pack(pady=10)
 
+        # CSV file setup
+        self.setup_csv()
+
         # Start a thread to listen for incoming messages
         if self.arduino:
             self.listening_thread = threading.Thread(target=self.listen_to_serial, daemon=True)
@@ -41,6 +47,29 @@ class ControlPanelGUI:
 
         # Bind the close event to call send_end_command
         self.root.protocol("WM_DELETE_WINDOW", self.on_close)
+
+    def setup_csv(self):
+        """Set up the CSV file with a header if it doesn't already exist."""
+        # Create the data directory if it doesn't exist
+        self.data_dir = "data"
+        os.makedirs(self.data_dir, exist_ok=True)
+
+        # Generate a filename with the current date and time
+        current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        self.csv_file = os.path.join(self.data_dir, f"serial_log_{current_time}.csv")
+
+        # Create the CSV file with a header
+        with open(self.csv_file, mode="w", newline="") as file:
+            writer = csv.writer(file)
+            writer.writerow(["Message"])  # Add a header row
+
+    def write_to_csv(self, message):
+        """Write a message to the CSV file."""
+        # with open(self.csv_file, mode="a", newline="") as file:
+        #     writer = csv.writer(file, quoting=csv.QUOTE_MINIMAL)
+        #     writer.writerow([message])
+        with open(self.csv_file, mode="a", newline="") as file:
+            file.write(message + "\n")  # Write the message directly without any quoting or escaping
 
     def send_command(self, command):
         if self.arduino:
@@ -70,6 +99,7 @@ class ControlPanelGUI:
                 try:
                     message = self.arduino.readline().decode().strip()
                     self.log_message(f"Received: {message}")
+                    self.write_to_csv(message)  # Save the message to the CSV file
                 except serial.SerialException as e:
                     self.log_message(f"Error reading from serial: {e}")
                     break
